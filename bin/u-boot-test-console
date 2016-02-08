@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Hook script for U-Boot pytest framework
+#
+
+set -e
+
+board_type=$1
+board_identity=$2
+
+bin_dir=$(dirname $0)
+source ${bin_dir}/${board_type}-${board_identity}.conf
+
+qemu_conf=${board_type}-${board_identity}
+
+mkdir -p /tmp/qemu
+qemu_pid=/tmp/qemu/${qemu_conf}.pid
+qemu_monitor_sock=/tmp/qemu/${qemu_conf}-monitor.sock
+
+exec ${qemu_bin} \
+    --pidfile ${qemu_pid} \
+    -M ${qemu_machine} \
+    -cpu ${qemu_cpu} \
+    -m ${qemu_mem} \
+    -nographic \
+    -monitor unix:${qemu_monitor_sock},server,nowait \
+    ${qemu_target} \
+    ${qemu_network} \
+    ${qemu_netdev}
+
+rm -f ${qemu_monitor_sock}
+rm -f ${qemu_pid}
