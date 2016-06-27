@@ -8,10 +8,12 @@ set -e
 board_type=$1
 board_identity=$2
 
-bin_dir=$(dirname $0)
-source ${bin_dir}/${board_type}-${board_identity}.conf
-
+top_dir=$(readlink -f $(dirname $0)/..)
+bin_dir=${top_dir}/bin
+conf_dir=${top_dir}/conf
 qemu_conf=${board_type}-${board_identity}
+
+source ${conf_dir}/${board_type}-${board_identity}.conf
 
 mkdir -p /tmp/qemu
 qemu_pid=/tmp/qemu/${qemu_conf}.pid

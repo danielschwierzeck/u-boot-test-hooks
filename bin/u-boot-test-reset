@@ -3,6 +3,8 @@
 # Hook script for U-Boot pytest framework
 #
 
+set -e
+
 board_type=$1
 board_identity=$2
 
