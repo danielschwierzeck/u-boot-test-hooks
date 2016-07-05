@@ -16,6 +16,7 @@ board_identity=$2
 top_dir=$(readlink -f $(dirname $0)/..)
 bin_dir=${top_dir}/bin
 conf_dir=${top_dir}/conf
+data_dir=${top_dir}/data
 qemu_conf=${board_type}-${board_identity}
 
 source ${conf_dir}/${board_type}-${board_identity}.conf
@@ -24,7 +25,7 @@ qemu_pid=${U_BOOT_BUILD_DIR}/qemu.pid
 qemu_monitor_sock=${U_BOOT_BUILD_DIR}/qemu.sock
 qemu_pflash_bin=${U_BOOT_BUILD_DIR}/pflash.bin
 qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
-qemu_network="-netdev user,id=ubtest,tftp=${U_BOOT_BUILD_DIR}"
+qemu_network="-netdev user,id=ubtest,tftp=${data_dir}"
 qemu_netdev="-device pcnet,netdev=ubtest"
 
 exec ${qemu_bin} \
