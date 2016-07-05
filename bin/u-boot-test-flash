@@ -1,6 +1,20 @@
 #!/bin/bash
 #
+# SPDX-License-Identifier: MIT
+#
 # Hook script for U-Boot pytest framework
 #
 
 set -e
+set -x
+
+export LC_ALL=C
+
+board_type=$1
+board_identity=$2
+
+qemu_pflash_bin=${U_BOOT_BUILD_DIR}/pflash.bin
+uboot_bin=${U_BOOT_BUILD_DIR}/u-boot.bin
+
+dd if=/dev/zero bs=1M count=4 | tr '\000' '\377' > ${qemu_pflash_bin}
+dd if=${uboot_bin} of=${qemu_pflash_bin} conv=notrunc

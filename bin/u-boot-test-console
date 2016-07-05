@@ -1,9 +1,14 @@
 #!/bin/bash
 #
+# SPDX-License-Identifier: MIT
+#
 # Hook script for U-Boot pytest framework
 #
 
 set -e
+set -x
+
+export LC_ALL=C
 
 board_type=$1
 board_identity=$2
@@ -15,9 +20,12 @@ qemu_conf=${board_type}-${board_identity}
 
 source ${conf_dir}/${board_type}-${board_identity}.conf
 
-mkdir -p /tmp/qemu
-qemu_pid=/tmp/qemu/${qemu_conf}.pid
-qemu_monitor_sock=/tmp/qemu/${qemu_conf}-monitor.sock
+qemu_pid=${U_BOOT_BUILD_DIR}/qemu.pid
+qemu_monitor_sock=${U_BOOT_BUILD_DIR}/qemu.sock
+qemu_pflash_bin=${U_BOOT_BUILD_DIR}/pflash.bin
+qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
+qemu_network="-netdev user,id=ubtest,tftp=${U_BOOT_BUILD_DIR}"
+qemu_netdev="-device pcnet,netdev=ubtest"
 
 exec ${qemu_bin} \
     --pidfile ${qemu_pid} \
@@ -26,9 +34,6 @@ exec ${qemu_bin} \
     -m ${qemu_mem} \
     -nographic \
     -monitor unix:${qemu_monitor_sock},server,nowait \
-    ${qemu_target} \
+    ${qemu_pflash} \
     ${qemu_network} \
     ${qemu_netdev}
-
-rm -f ${qemu_monitor_sock}
-rm -f ${qemu_pid}

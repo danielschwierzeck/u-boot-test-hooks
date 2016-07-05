@@ -1,14 +1,18 @@
 #!/bin/bash
 #
+# SPDX-License-Identifier: MIT
+#
 # Hook script for U-Boot pytest framework
 #
 
 set -e
+set -x
+
+export LC_ALL=C
 
 board_type=$1
 board_identity=$2
 
-qemu_conf=${board_type}-${board_identity}
-qemu_monitor_sock=/tmp/qemu/${qemu_conf}-monitor.sock
+qemu_monitor_sock=${U_BOOT_BUILD_DIR}/qemu.sock
 
 echo system_reset | nc -U ${qemu_monitor_sock} || exit 0

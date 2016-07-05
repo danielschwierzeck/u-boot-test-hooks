@@ -1,20 +1,22 @@
 #!/bin/bash
 #
-# Sample script for running U-Boot pytest framework in a
-# Qemu MIPS Malta machine with a 24Kc CPU
+# SPDX-License-Identifier: MIT
+#
+# Helper script for running U-Boot pytest framework with various
+# Qemu MIPS Malta machine configs.
 # 
 # Usage:
-# - setup your toolchain by setting CROSS_COMPILE and CONFIG_USE_PRIVATE_LIBGCC=y
+# - setup your toolchain by setting CROSS_COMPILE
 # - run this script from the U-Boot source directory
 #
 
 set -e
-set -x
 
 top_dir=$(readlink -f $(dirname $0))
 bin_dir=${top_dir}/bin
 conf_dir=${top_dir}/conf
 python_dir=${top_dir}/py
+test_dir=/tmp/u-boot-test
 build_dir=$(mktemp -d)
 
 export PATH=${bin_dir}:${PATH}
@@ -37,9 +39,12 @@ for conf_file in ${conf_files[*]}; do
     ./test/py/test.py \
         --board-type ${board_type} \
         --board-identity ${board_identity} \
-        --build --build-dir ${build_dir}/${conf_nosuffix} \
-        -k 'not (test_sleep or test_md)' || ret=$?
+        --build \
+        --build-dir ${build_dir}/${conf_nosuffix} \
+        --result-dir ${test_dir}/${conf_nosuffix} \
+        -k 'not test_sleep' || ret=$?
 done
 
 rm -rf ${build_dir}
+
 exit $ret
