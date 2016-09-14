@@ -9,8 +9,8 @@ top_dir=$(readlink -f $(dirname $0)/..)
 tools_dir=${top_dir}/tools
 data_dir=${top_dir}/data
 
-if [ $# -ne 2 ]; then
-    echo "Usage: $(basename $0) <u-boot build dir> <qemu conf file>"
+if [ $# -lt 2 ]; then
+    echo "Usage: $(basename $0) <u-boot build dir> <qemu conf file> [extra-args]"
     exit 1
 fi
 
@@ -32,6 +32,9 @@ if [ ! -f $conf_file ]; then
     exit 1
 fi
 
+shift 2
+qemu_extra_args="$@"
+
 U_BOOT_BUILD_DIR=$uboot_dir
 source $conf_file
 
@@ -50,4 +53,5 @@ ${qemu_bin} \
     -nographic \
     ${qemu_pflash} \
     ${qemu_network} \
-    ${qemu_netdev}
+    ${qemu_netdev} \
+    ${qemu_extra_args}
