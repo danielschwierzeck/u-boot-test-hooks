@@ -33,6 +33,13 @@ if [ ! -f $conf_file ]; then
 fi
 
 shift 2
+
+connect_gdb=0
+if [ "$1" = "gdb" ]; then
+    connect_gdb=1
+    shift 1
+fi
+
 qemu_extra_args="$@"
 
 U_BOOT_BUILD_DIR=$uboot_dir
@@ -42,9 +49,15 @@ qemu_pflash_bin=${uboot_dir}/pflash.bin
 qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
 qemu_network="-netdev user,id=ubtest,tftp=${data_dir}"
 qemu_netdev="-device pcnet,netdev=ubtest"
+qemu_gdb=""
 
-dd if=/dev/zero bs=1M count=4 | tr '\000' '\377' > ${qemu_pflash_bin}
-dd if=${uboot_bin} of=${qemu_pflash_bin} conv=notrunc
+if [ $connect_gdb -eq 1 ]; then
+    qemu_pflash=""
+    qemu_gdb="-s -bios ${uboot_dir}/u-boot.bin"
+else
+    dd if=/dev/zero bs=1M count=4 | tr '\000' '\377' > ${qemu_pflash_bin}
+    dd if=${uboot_bin} of=${qemu_pflash_bin} conv=notrunc
+fi
 
 ${qemu_bin} \
     -M ${qemu_machine} \
@@ -54,4 +67,5 @@ ${qemu_bin} \
     ${qemu_pflash} \
     ${qemu_network} \
     ${qemu_netdev} \
+    ${qemu_gdb} \
     ${qemu_extra_args}
