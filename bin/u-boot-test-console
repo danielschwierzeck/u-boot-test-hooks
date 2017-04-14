@@ -26,7 +26,7 @@ qemu_monitor_sock=${U_BOOT_BUILD_DIR}/qemu.sock
 qemu_pflash_bin=${U_BOOT_BUILD_DIR}/pflash.bin
 qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
 qemu_network="-netdev user,id=ubtest,tftp=${data_dir}"
-qemu_netdev="-device pcnet,netdev=ubtest"
+qemu_netdev="-device ${qemu_netdevice},netdev=ubtest"
 
 exec ${qemu_bin} \
     --pidfile ${qemu_pid} \

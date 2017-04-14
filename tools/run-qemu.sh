@@ -48,7 +48,7 @@ source $conf_file
 qemu_pflash_bin=${uboot_dir}/pflash.bin
 qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
 qemu_network="-netdev user,id=ubtest,tftp=${data_dir}"
-qemu_netdev="-device pcnet,netdev=ubtest"
+qemu_netdev="-device ${qemu_netdevice},netdev=ubtest"
 qemu_gdb=""
 
 if [ $connect_gdb -eq 1 ]; then
