@@ -40,10 +40,22 @@ if [ "$1" = "gdb" ]; then
     shift 1
 fi
 
+swap_endianess=0
+if [ "$1" = "swap" ]; then
+    swap_endianess=1
+    shift 1
+fi
+
 qemu_extra_args="$@"
 
 U_BOOT_BUILD_DIR=$uboot_dir
 source $conf_file
+
+uboot_swap="${uboot_dir}/u-boot-swap.bin"
+if [ "$swap_endianess" = "1" ]; then
+    hexdump -v -e '1/4 "%08x"' -e '"\n"' ${uboot_bin} | xxd -r -p > ${uboot_swap}
+    uboot_bin=${uboot_swap}
+fi
 
 qemu_pflash_bin=${uboot_dir}/pflash.bin
 qemu_pflash="-drive if=pflash,file=${qemu_pflash_bin},format=raw"
@@ -53,7 +65,7 @@ qemu_gdb=""
 
 if [ $connect_gdb -eq 1 ]; then
     qemu_pflash=""
-    qemu_gdb="-s -bios ${uboot_dir}/u-boot.bin"
+    qemu_gdb="-s -bios ${uboot_bin}"
 else
     dd if=/dev/zero bs=1M count=4 | tr '\000' '\377' > ${qemu_pflash_bin}
     dd if=${uboot_bin} of=${qemu_pflash_bin} conv=notrunc
